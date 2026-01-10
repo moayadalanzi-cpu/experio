@@ -8,18 +8,13 @@ export default function Home() {
 
   useEffect(() => {
     const run = async () => {
-      try {
-        const { error } = await supabase.from('test').select('*').limit(1);
+      const { error } = await supabase.from('test').select('*').limit(1);
 
-        if (error) {
-          console.error(error);
-          setStatus('Connected ⚠️ (table/policy issue)');
-        } else {
-          setStatus('Supabase connected ✅');
-        }
-      } catch (e) {
-        console.error(e);
-        setStatus('Supabase connection failed ❌');
+      if (error) {
+        console.error(error);
+        setStatus('Connected ⚠️ (table or policy issue)');
+      } else {
+        setStatus('Supabase connected ✅');
       }
     };
 
