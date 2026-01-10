@@ -7,23 +7,18 @@ export default function Home() {
   const [status, setStatus] = useState('Connecting to Supabase...');
 
   useEffect(() => {
-    const testConnection = async () => {
-      try {
-        const { error } = await supabase.from('test').select('*').limit(1);
+    const run = async () => {
+      const { error } = await supabase.from('test').select('*').limit(1);
 
-        if (error) {
-          console.error(error);
-          setStatus('Connected to Supabase ⚠️ (table may not exist)');
-        } else {
-          setStatus('Supabase connected successfully ✅');
-        }
-      } catch (err) {
-        console.error(err);
-        setStatus('Supabase connection failed ❌');
+      if (error) {
+        console.error(error);
+        setStatus('Connected ⚠️ (table/policy issue)');
+      } else {
+        setStatus('Supabase connected ✅');
       }
     };
 
-    testConnection();
+    run();
   }, []);
 
   return (
