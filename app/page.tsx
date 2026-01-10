@@ -1,8 +1,38 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+
 export default function Home() {
+  const [status, setStatus] = useState('Connecting to Supabase...');
+
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const { error } = await supabase
+          .from('test')
+          .select('*')
+          .limit(1);
+
+        if (error) {
+          console.error(error);
+          setStatus('Connected ⚠️ (table or policy issue)');
+        } else {
+          setStatus('Supabase connected successfully ✅');
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus('Supabase connection failed ❌');
+      }
+    };
+
+    run();
+  }, []);
+
   return (
     <main style={{ padding: 40 }}>
-      <h1>HOME UPDATED ✅✅✅</h1>
-      <p>Timestamp: 2026-01-10</p>
+      <h1>Experio 🚀</h1>
+      <p>{status}</p>
     </main>
   );
 }
