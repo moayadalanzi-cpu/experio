@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
-  useEffect(() => {
-    console.log("✅ Supabase client (browser):", supabase);
-  }, []);
+  console.log("Supabase:", supabase);
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
       {/* Header */}
       <header className="border-b">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+          {/* Logo + Name */}
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-2xl bg-zinc-900" />
             <div>
@@ -21,6 +19,7 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Nav */}
           <nav className="flex items-center gap-2">
             <a
               href="/login"
@@ -38,34 +37,28 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Content */}
+      {/* Main */}
       <main className="mx-auto max-w-5xl px-6 py-10">
-        {/* Debug badge يظهر داخل الصفحة */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm">
-          <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
-          Client OK — Supabase loaded
-        </div>
-
         {/* Hero */}
         <section className="rounded-3xl border p-10">
-          <h1 className="mb-4 text-4xl font-bold leading-tight">
+          <h1 className="text-4xl font-bold leading-tight">
             شارك تجربتك... وخليها تفيد العالم
           </h1>
-          <p className="max-w-2xl text-zinc-600 leading-8">
-            منصة اجتماعية لمشاركة التجارب في السفر والعمل والصحة. قريباً ستتمكن من نشر قصتك،
-            متابعة الآخرين، وحفظ التجارب المفيدة.
+          <p className="mt-4 max-w-2xl text-zinc-600 leading-8">
+            Experio منصة اجتماعية لمشاركة التجارب في السفر والعمل والصحة.
+            قريبًا ستتمكن من نشر قصتك، متابعة الآخرين، وحفظ التجارب المفيدة.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex gap-4">
             <a
               href="/create"
-              className="rounded-full bg-zinc-900 px-6 py-3 text-white hover:bg-zinc-800"
+              className="rounded-2xl bg-zinc-900 px-6 py-3 text-white hover:bg-zinc-800"
             >
               إنشاء منشور
             </a>
             <a
               href="#sections"
-              className="rounded-full border px-6 py-3 hover:bg-zinc-50"
+              className="rounded-2xl border px-6 py-3 hover:bg-zinc-50"
             >
               استعرض الأقسام
             </a>
@@ -73,27 +66,40 @@ export default function Home() {
         </section>
 
         {/* Sections */}
-        <section id="sections" className="mt-10 grid gap-6 md:grid-cols-3">
-          <div className="rounded-3xl border p-6">
-            <div className="mb-2 text-lg font-semibold">✈️ السفر</div>
-            <p className="text-zinc-600">
+        <section
+          id="sections"
+          className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3"
+        >
+          <div className="rounded-3xl border p-8">
+            <div className="text-xl font-semibold">✈️ السفر</div>
+            <p className="mt-3 text-zinc-600 leading-7">
               تجارب السفر، الفنادق، الطرق، النصائح، ومواقف حقيقية.
             </p>
           </div>
 
-          <div className="rounded-3xl border p-6">
-            <div className="mb-2 text-lg font-semibold">💼 العمل</div>
-            <p className="text-zinc-600">
+          <div className="rounded-3xl border p-8">
+            <div className="text-xl font-semibold">💼 العمل</div>
+            <p className="mt-3 text-zinc-600 leading-7">
               تجارب الوظائف، المشاريع، مقابلات العمل، والنجاح والفشل.
             </p>
           </div>
 
-          <div className="rounded-3xl border p-6">
-            <div className="mb-2 text-lg font-semibold">🧑‍⚕️ الصحة</div>
-            <p className="text-zinc-600">
+          <div className="rounded-3xl border p-8">
+            <div className="text-xl font-semibold">🏥 الصحة</div>
+            <p className="mt-3 text-zinc-600 leading-7">
               تجارب صحية، تغذية، رياضة، وطرق التعامل مع الحالات المختلفة.
             </p>
           </div>
+        </section>
+
+        {/* Status Box */}
+        <section className="mt-10 rounded-3xl border p-8">
+          <div className="text-xl font-semibold">حالة المشروع</div>
+          <ul className="mt-4 space-y-3 text-zinc-700">
+            <li>✅ Vercel تم نشر الموقع على</li>
+            <li>✅ تم تجهيز Supabase وربط المتغيرات في Vercel</li>
+            <li>⏳ الخطوة القادمة: صفحة تسجيل الدخول وربط المستخدمين</li>
+          </ul>
         </section>
       </main>
     </div>
