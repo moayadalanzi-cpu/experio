@@ -1,8 +1,33 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+
 export default function TestPage() {
+  const [status, setStatus] = useState('Connecting...');
+
+  useEffect(() => {
+    const testConnection = async () => {
+      const { error } = await supabase
+        .from('test')
+        .select('*')
+        .limit(1);
+
+      if (error) {
+        console.error(error);
+        setStatus('Connected but table not found ⚠️');
+      } else {
+        setStatus('Connected successfully ✅');
+      }
+    };
+
+    testConnection();
+  }, []);
+
   return (
     <main style={{ padding: 40 }}>
-      <h1>Test Page Works ✅</h1>
-      <p>If you see this page, routing is working correctly.</p>
+      <h1>Supabase Connection Test</h1>
+      <p>{status}</p>
     </main>
   );
 }
