@@ -1,44 +1,30 @@
-"use client";
+import { createClient } from "@/lib/supabaseClient";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+export default async function HomePage() {
+  const supabase = createClient();
 
-type Experience = {
-  id: string;
-  title: string;
-  category: string | null;
-  created_at: string;
-};
-
-export default function ExperiencePage({ params }: { params: { id: string } }) {
-  const [item, setItem] = useState<Experience | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const load = async () => {
-      const { data } = await supabase
-        .from("experiences")
-        .select("*")
-        .eq("id", params.id)
-        .single();
-
-      setItem(data);
-      setLoading(false);
-    };
-
-    load();
-  }, [params.id]);
-
-  if (loading) return <p className="p-6">Loading...</p>;
-  if (!item) return <p className="p-6">Not found</p>;
+  const { data: experiences } = await supabase
+    .from("experiences")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   return (
-    <main className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">{item.title}</h1>
-      <div className="text-sm text-gray-500 mb-4">
-        {item.category || "Uncategorized"} •{" "}
-        {new Date(item.created_at).toLocaleString()}
-      </div>
-    </main>
-  );
-}
+    <main className="min-h-screen bg-slate-950 text-white px-6 py-10">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold mb-2">Latest Experiences</h1>
+        <p className="text-slate-400 mb-8">
+          Real stories from people about travel, work, and health.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {experiences?.map((exp) => (
+            <div
+              key={exp.id}
+              className="bg-slate-900 rounded-2xl p-5 hover:shadow-xl hover:shadow-cyan-500/10 transition"
+            >
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-xs bg-cyan-500/20 text-cyan-300 px-3 py-1 rounded-full">
+                  {exp.category || "General"}
+                </span>
+                <span className="text-xs text-slate-500">
+                  {new Date(exp.created_at).toLocaleDateString()}
