@@ -1,30 +1,41 @@
-import { createClient } from "@/lib/supabaseClient";
+"use client";
 
-export default async function HomePage() {
-  const supabase = createClient();
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 
-  const { data: experiences } = await supabase
-    .from("experiences")
-    .select("*")
-    .order("created_at", { ascending: false });
+type Experience = {
+  id: string;
+  title: string;
+  category: string | null;
+  created_at: string;
+};
 
-  return (
-    <main className="min-h-screen bg-slate-950 text-white px-6 py-10">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2">Latest Experiences</h1>
-        <p className="text-slate-400 mb-8">
-          Real stories from people about travel, work, and health.
-        </p>
+const CATEGORIES = ["All", "Travel", "Work", "Health"] as const;
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {experiences?.map((exp) => (
-            <div
-              key={exp.id}
-              className="bg-slate-900 rounded-2xl p-5 hover:shadow-xl hover:shadow-cyan-500/10 transition"
-            >
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-xs bg-cyan-500/20 text-cyan-300 px-3 py-1 rounded-full">
-                  {exp.category || "General"}
-                </span>
-                <span className="text-xs text-slate-500">
-                  {new Date(exp.created_at).toLocaleDateString()}
+export default function Home() {
+  const [items, setItems] = useState<Experience[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+  const [cat, setCat] = useState<(typeof CATEGORIES)[number]>("All");
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from("experiences")
+        .select("id, title, category, created_at")
+        .order("created_at", { ascending: false });
+
+      setItems(data || []);
+      setLoading(false);
+    };
+    load();
+  }, []);
+
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return items.filter((x) => {
+      const okCat = cat === "All" ? true : (x.category || "").toLowerCase() === cat.toLowerCase();
+      const okSearch = !s ? true : (x.title || "").toLowerCase().includes(s);
+      return okCat && okSearch;
+    })
