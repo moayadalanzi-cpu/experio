@@ -2,130 +2,135 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "../../lib/supabaseClient";
-
-type Category = "Travel" | "Work" | "Health";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function NewPostPage() {
-  const router = useRouter();
-  const [ready, setReady] = useState(false);
+const router = useRouter();
 
-  const [category, setCategory] = useState<Category>("Travel");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+const [ready, setReady] = useState(false);
+const [session, setSession] = useState<any>(null);
+const [title, setTitle] = useState("");
+const [description, setDescription] = useState("");
+const [category, setCategory] = useState("Travel");
+const [saving, setSaving] = useState(false);
+const [msg, setMsg] = useState("");
 
-  // 🔐 حماية الصفحة (فقط للمسجلين)
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        router.replace("/login");
-        return;
-      }
-      setReady(true);
-    };
+useEffect(() => {
+const checkSession = async () => {
+const { data } = await supabase.auth.getSession();
 
-    checkAuth();
-  }, [router]);
-
-  const submit = async () => {
-    setMsg(null);
-
-    if (!title.trim() || !description.trim()) {
-      setMsg("Title and description are required.");
-      return;
-    }
-
-    setLoading(true);
-
-    const { error } = await supabase.from("posts").insert({
-      title: title.trim(),
-      description: description.trim(),
-      category,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      setMsg(error.message);
-      return;
-    }
-
-    router.push("/");
-  };
-
-  if (!ready) {
-    return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-        Loading...
-      </main>
-    );
+```
+  if (!data.session) {
+    router.replace("/login");
+    return;
   }
 
-  return (
-    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-white/5 p-8">
-        <h1 className="text-3xl font-semibold mb-8">New Post</h1>
+  setSession(data.session);
+  setReady(true);
+};
 
-        {msg && (
-          <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
-            {msg}
-          </div>
-        )}
+checkSession();
+```
 
-        <div className="space-y-5">
-          <div>
-            <label className="block text-sm opacity-80 mb-2">Category</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as Category)}
-              className="w-full rounded-2xl bg-slate-900/60 border border-white/10 px-4 py-3 outline-none"
-            >
-              <option value="Travel">Travel</option>
-              <option value="Work">Work</option>
-              <option value="Health">Health</option>
-            </select>
-          </div>
+}, [router]);
 
-          <div>
-            <label className="block text-sm opacity-80 mb-2">Title</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Write a short title..."
-              className="w-full rounded-2xl bg-slate-900/60 border border-white/10 px-4 py-3 outline-none"
-            />
-          </div>
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+e.preventDefault();
+setMsg("");
 
-          <div>
-            <label className="block text-sm opacity-80 mb-2">Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Write your experience..."
-              rows={8}
-              className="w-full rounded-2xl bg-slate-900/60 border border-white/10 px-4 py-3 outline-none"
-            />
-          </div>
+```
+if (!session) return;
 
-          <button
-            onClick={submit}
-            disabled={loading}
-            className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 disabled:opacity-60 px-4 py-3 font-medium"
-          >
-            {loading ? "Publishing..." : "Publish"}
-          </button>
+if (!title.trim() || !description.trim()) {
+  setMsg("Please fill in all fields.");
+  return;
+}
 
-          <button
-            onClick={() => router.push("/")}
-            className="w-full rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-3"
-          >
-            Cancel
-          </button>
-        </div>
+setSaving(true);
+
+const { error } = await supabase.from("posts").insert([
+  {
+    title: title.trim(),
+    description: description.trim(),
+    category,
+    user_id: session.user.id,
+  },
+]);
+
+setSaving(false);
+
+if (error) {
+  setMsg(error.message);
+  return;
+}
+
+router.push("/");
+```
+
+};
+
+if (!ready) {
+return ( <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+Loading... </main>
+);
+}
+
+return ( <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 py-10"> <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8"> <h1 className="text-3xl font-semibold mb-8">New Post</h1>
+
+```
+    {msg && (
+      <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-red-300">
+        {msg}
       </div>
-    </main>
-  );
+    )}
+
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div>
+        <label className="mb-2 block text-sm text-white/80">Title</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter post title"
+          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none"
+        />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm text-white/80">Category</label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none"
+        >
+          <option value="Travel">Travel</option>
+          <option value="Work">Work</option>
+          <option value="Health">Health</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm text-white/80">Description</label>
+        <textarea
+          rows={8}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Write your experience..."
+          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={saving}
+        className="rounded-2xl bg-white text-slate-950 px-5 py-3 font-medium disabled:opacity-60"
+      >
+        {saving ? "Publishing..." : "Publish Post"}
+      </button>
+    </form>
+  </div>
+</main>
+```
+
+);
 }
