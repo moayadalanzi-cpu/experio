@@ -4,79 +4,71 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function NewPostPage() {
+export default function Page() {
+
   const router = useRouter();
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Travel");
-  const [msg, setMsg] = useState("");
+  const [title,setTitle] = useState("");
+  const [description,setDescription] = useState("");
+  const [category,setCategory] = useState("Travel");
 
-  const handleSubmit = async (e: any) => {
+  async function submit(e:any){
     e.preventDefault();
 
-    const { error } = await supabase.from("posts").insert([
+    await supabase.from("posts").insert([
       {
-        title,
-        description,
-        category,
-      },
+        title:title,
+        description:description,
+        category:category
+      }
     ]);
 
-    if (error) {
-      setMsg(error.message);
-      return;
-    }
-
     router.push("/");
-  };
+  }
 
   return (
-    <main style={{ padding: "40px", maxWidth: "600px", margin: "auto" }}>
+
+    <main style={{padding:"40px",maxWidth:"600px",margin:"auto"}}>
+
       <h1>New Post</h1>
 
-      {msg && <p style={{ color: "red" }}>{msg}</p>}
+      <form onSubmit={submit}>
 
-      <form onSubmit={handleSubmit}>
+        <p>Title</p>
+        <input
+        value={title}
+        onChange={(e)=>setTitle(e.target.value)}
+        style={{width:"100%"}}
+        />
 
-        <div>
-          <label>Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e)=>setTitle(e.target.value)}
-            style={{ width: "100%", marginBottom: "20px" }}
-          />
-        </div>
+        <p>Category</p>
+        <select
+        value={category}
+        onChange={(e)=>setCategory(e.target.value)}
+        style={{width:"100%"}}
+        >
+          <option>Travel</option>
+          <option>Work</option>
+          <option>Health</option>
+        </select>
 
-        <div>
-          <label>Category</label>
-          <select
-            value={category}
-            onChange={(e)=>setCategory(e.target.value)}
-            style={{ width: "100%", marginBottom: "20px" }}
-          >
-            <option value="Travel">Travel</option>
-            <option value="Work">Work</option>
-            <option value="Health">Health</option>
-          </select>
-        </div>
+        <p>Description</p>
+        <textarea
+        rows={6}
+        value={description}
+        onChange={(e)=>setDescription(e.target.value)}
+        style={{width:"100%"}}
+        />
 
-        <div>
-          <label>Description</label>
-          <textarea
-            rows={6}
-            value={description}
-            onChange={(e)=>setDescription(e.target.value)}
-            style={{ width: "100%", marginBottom: "20px" }}
-          />
-        </div>
+        <br/><br/>
 
         <button type="submit">
           Publish
         </button>
 
       </form>
+
     </main>
+
   );
 }
